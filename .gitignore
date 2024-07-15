@@ -97,3 +97,6 @@ Icon?
 .Spotlight-V100
 .Trashes
 .DS_Store
+
+# test
+**/test.py
