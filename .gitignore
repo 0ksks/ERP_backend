@@ -100,3 +100,6 @@ Icon?
 
 # test
 **/test.py
+
+# sql
+**/*.sql
