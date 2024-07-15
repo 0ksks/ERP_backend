@@ -1,7 +1,6 @@
 from dataclasses import dataclass, asdict
 import json
 from typing import Any
-from testInherit import Test
 
 @dataclass
 class ResponseBody:
