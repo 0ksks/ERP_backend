@@ -8,11 +8,11 @@ def get_some_endpoint():
     return jsonify({"message": "GET request received"})
 
 
-@app.route("/supplier/create", methods=["POST"])
+@app.route("/api/supplier/create_success", methods=["POST"])
 def post_some_endpoint():
-    data = request.get_json()
-    return jsonify({"message": "POST request received", "data": data})
-
+    return jsonify(
+        {"code": 1, "message": "success", "data": {"supplierID": "supplierID_value"}}
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)
