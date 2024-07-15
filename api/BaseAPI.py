@@ -15,3 +15,5 @@ class ResponseBody:
         if data["body"] is None:
             data["body"] = {}
         return json.dumps(data)
+
+test = "test"
