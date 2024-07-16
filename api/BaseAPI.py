@@ -2,6 +2,7 @@ from dataclasses import dataclass, asdict
 import json
 from typing import Any
 
+
 @dataclass
 class ResponseBody:
     code: int

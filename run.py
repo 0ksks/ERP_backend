@@ -1,12 +1,11 @@
-from model import create_app,db
+from model import create_app
 from flask import make_response
 from flask_cors import CORS
-from flask_migrate import Migrate
+
 app = create_app()
 
 app.config["JSON_AS_ASCII"] = False
-# migrate = Migrate(app, db)
-# manager = Manager(app)
+
 
 @app.after_request
 def after(resp):

@@ -10,9 +10,9 @@ class BaseRepository(Generic[T]):
     model: Type[T] = None
 
     def get(
-        self, id: PrimaryKey
+        self, ID: PrimaryKey
     ) -> Optional[T]:  # 用于主键查询，返回一条数据，get方法不能使用键值对，只能接收单值
-        return self.model.query.get(id)
+        return self.model.query.get(ID)
 
     def query_list(
         self, kwargs: dict[str, Any]
@@ -31,9 +31,9 @@ class BaseRepository(Generic[T]):
         return instance
 
     def update(
-        self, id: PrimaryKey, kwargs: dict[str, Any]
+        self, ID: PrimaryKey, kwargs: dict[str, Any]
     ) -> Optional[T]:  # 更新数据，id为对应表主键，kwargs为需要更新的内容
-        instance = self.get(id)
+        instance = self.get(ID)
         if instance is None:
             return None
         for attr, value in kwargs.items():
