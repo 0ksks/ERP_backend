@@ -1,4 +1,4 @@
 def register_routes(app):
-    from .DocumentFlow import documentFlowBP
+    from .apis import Controller
 
-    app.register_blueprint(documentFlowBP)
+    app.register_blueprint(Controller.register("Supplier"))
