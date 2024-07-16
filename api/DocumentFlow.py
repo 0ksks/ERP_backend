@@ -5,9 +5,13 @@ documentFlowBP = Blueprint("DocumentFlow", __name__)
 documentFlowRepository = DocumentFlowRepository()
 
 
-@documentFlowBP.route("/document_flow")
-def test():
-    documentFlows = documentFlowRepository.query_one(
-        kwargs={"userID": 1, "purchaseOrderID": 1111}
-    )
-    return jsonify(documentFlows.to_dict())
+class TestClass:
+    routeName = "document_flow"
+
+    @staticmethod
+    @documentFlowBP.route(f"/{routeName}")
+    def test():
+        documentFlows = documentFlowRepository.query_one(
+            kwargs={"userID": 1, "purchaseOrderID": 1111}
+        )
+        return jsonify(documentFlows.to_dict())
