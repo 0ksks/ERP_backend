@@ -1,7 +1,6 @@
-from datetime import date
-
-from sqlalchemy import ForeignKey, CheckConstraint
+from sqlalchemy import ForeignKey
 from sqlalchemy_serializer import SerializerMixin
+
 from . import db
 
 
@@ -74,7 +73,7 @@ class Material(db.Model, SerializerMixin):
 
 class Stock(db.Model, SerializerMixin):
     __tablename__ = "Stock"
-    StockID = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 从1开始自增
+    stockID = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 从1开始自增
     userID = db.Column(db.Integer, ForeignKey("User.userID"))
     materialID = db.Column(db.Integer, db.ForeignKey("Material.materialID"))
     plant = db.Column(db.String(255))

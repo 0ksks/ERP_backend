@@ -4,6 +4,126 @@ import unittest
 from run import app
 
 
+class TestUser(unittest.TestCase):
+
+    def setUp(self):
+        self.app = app.test_client()
+        self.app.testing = True
+
+    def test_login_success(self):
+        response = self.app.post(
+            "/api/user/login_success",
+            json={"userID": 1, "password": "password_value"},
+            headers={"Content-Type": "application/json"}
+        )
+        print("real data")
+        print(response.status_code)
+        print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
+        print("template data")
+        template = """{
+    "code": 201,
+    "message": "success",
+    "data": {
+        "userID": 1,
+        "role": "role_value"
+    }
+}"""
+        print(201)
+        print(template)
+
+    def test_login_not_found(self):
+        response = self.app.post(
+            "/api/user/login_not_found",
+            json={"userID": 404, "password": "password_value_404"},
+            headers={"Content-Type": "application/json"}
+        )
+        print("real data")
+        print(response.status_code)
+        print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
+        print("template data")
+        template = """{
+    "code": 404,
+    "message": "user not found",
+    "data": {}
+}"""
+        print(200)
+        print(template)
+
+    def test_login_wrong_password(self):
+        response = self.app.post(
+            "/api/user/login_wrong_password",
+            json={"userID": 1, "password": "password_value_404"},
+            headers={"Content-Type": "application/json"}
+        )
+        print("real data")
+        print(response.status_code)
+        print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
+        print("template data")
+        template = """{
+    "code": 401,
+    "message": "wrong password",
+    "data": {}
+}"""
+        print(200)
+        print(template)
+
+    def test_register_success(self):
+        response = self.app.post(
+            "/api/user/register_success",
+            json={"username": "username_value", "password": "password_value", "role": "role_value"},
+            headers={"Content-Type": "application/json"}
+        )
+        print("real data")
+        print(response.status_code)
+        print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
+        print("template data")
+        template = """{
+    "code": 201,
+    "message": "success",
+    "data": {
+        "userID": 1
+    }
+}"""
+        print(201)
+        print(template)
+
+    def test_change_password_success(self):
+        response = self.app.post(
+            "/api/user/change_password_success",
+            json={"oldPassword": "password_value", "newPassword": "new_password_value", "userID": 1},
+            headers={"Content-Type": "application/json"}
+        )
+        print("real data")
+        print(response.status_code)
+        print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
+        print("template data")
+        template = """{
+    "code": 201,
+    "message": "success",
+    "data": {}
+}"""
+        print(201)
+        print(template)
+
+    def test_change_password_wrong(self):
+        response = self.app.post(
+            "/api/user/change_password_wrong",
+            json={"oldPassword": "old_password_value", "newPassword": "new_password_value", "userID": 1},
+            headers={"Content-Type": "application/json"}
+        )
+        print("real data")
+        print(response.status_code)
+        print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
+        print("template data")
+        template = """{
+    "code": 401,
+    "message": "wrong password",
+    "data": {}
+}"""
+        print(200)
+        print(template)
+
+
 class TestGoodsReceipt(unittest.TestCase):
 
     def setUp(self):
@@ -16,8 +136,7 @@ class TestGoodsReceipt(unittest.TestCase):
             json={"userID": 1, "purchaseOrderID": 1, "materialID": 1, "supplierID": 1, "receiptDate": "2024/01/01",
                   "quantity": 1, "stockLocation": "stockLocation_value", "batch": "batch_value", "plant": "plant_value",
                   "movementType": "movementType_value", "documentDate": "2024/01/01", "postingDate": "2024/01/01"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
@@ -27,7 +146,7 @@ class TestGoodsReceipt(unittest.TestCase):
     "code": 201,
     "message": "success",
     "data": {
-        "goodsReceiptID": "goodsReceiptID_value"
+        "goodsReceiptID": 1
     }
 }"""
         print(201)
@@ -40,8 +159,7 @@ class TestGoodsReceipt(unittest.TestCase):
                   "receiptDate": "2024/01/01", "quantity": 1, "stockLocation": "stockLocation_value",
                   "batch": "batch_value", "plant": "plant_value", "movementType": "movementType_value",
                   "documentDate": "2024/01/01", "postingDate": "2024/01/01"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
@@ -58,23 +176,22 @@ class TestGoodsReceipt(unittest.TestCase):
     def test_update_not_found(self):
         response = self.app.patch(
             "/api/goods_receipt/update_not_found",
-            json={"goodsReceiptID": 1, "userID": 1, "purchaseOrderID": 1, "materialID": 1, "supplierID": 1,
-                  "receiptDate": "2024/01/01", "quantity": 1, "stockLocation": "stockLocation_value",
-                  "batch": "batch_value", "plant": "plant_value", "movementType": "movementType_value",
+            json={"goodsReceiptID": 404, "userID": 404, "purchaseOrderID": 404, "materialID": 404, "supplierID": 404,
+                  "receiptDate": "2024/01/01", "quantity": 404, "stockLocation": "stockLocation_value_404",
+                  "batch": "batch_value_404", "plant": "plant_value_404", "movementType": "movementType_value_404",
                   "documentDate": "2024/01/01", "postingDate": "2024/01/01"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
         print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
         print("template data")
         template = """{
-    "code": 204,
+    "code": 404,
     "message": "goods receipt not found",
     "data": []
 }"""
-        print(204)
+        print(200)
         print(template)
 
     def test_query_success(self):
@@ -84,8 +201,7 @@ class TestGoodsReceipt(unittest.TestCase):
                   "receiptDate": "2024/01/01", "quantity": 1, "stockLocation": "stockLocation_value",
                   "batch": "batch_value", "plant": "plant_value", "movementType": "movementType_value",
                   "documentDate": "2024/01/01", "postingDate": "2024/01/01"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
@@ -133,23 +249,22 @@ class TestGoodsReceipt(unittest.TestCase):
     def test_query_not_found(self):
         response = self.app.get(
             "/api/goods_receipt/query_not_found",
-            json={"goodsReceiptID": 1, "userID": 1, "purchaseOrderID": 1, "materialID": 1, "supplierID": 1,
-                  "receiptDate": "2024/01/01", "quantity": 1, "stockLocation": "stockLocation_value",
-                  "batch": "batch_value", "plant": "plant_value", "movementType": "movementType_value",
+            json={"goodsReceiptID": 404, "userID": 404, "purchaseOrderID": 404, "materialID": 404, "supplierID": 404,
+                  "receiptDate": "2024/01/01", "quantity": 404, "stockLocation": "stockLocation_value_404",
+                  "batch": "batch_value_404", "plant": "plant_value_404", "movementType": "movementType_value_404",
                   "documentDate": "2024/01/01", "postingDate": "2024/01/01"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
         print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
         print("template data")
         template = """{
-    "code": 204,
+    "code": 404,
     "message": "goods receipt not found",
     "data": []
 }"""
-        print(204)
+        print(200)
         print(template)
 
 
@@ -162,7 +277,7 @@ class TestMaterial(unittest.TestCase):
     def test_create_success(self):
         response = self.app.post(
             "/api/material/create_success",
-            json={"userID": 1, "materialName": "materialName_value", "description": "description_value",
+            json={"userID": 1, "materialName": "materialName_value2", "description": "description_value",
                   "baseUnit": "baseUnit_value", "materialGroup": "materialGroup_value", "division": "division_value",
                   "grossWeight": 1.1, "nettWeight": 1.1, "weightUnit": "weightUnit_value", "volume": 1.1,
                   "volumeUnit": "volumeUnit_value", "packMaterial": "packMaterial_value",
@@ -171,8 +286,7 @@ class TestMaterial(unittest.TestCase):
                   "mrpController": "mrpController_value", "lotSize": "lotSize_value", "minimumLotSize": 1,
                   "plannedDeliveryTime": "2024/01/01", "movingPrice": 1.1, "priceUnit": "priceUnit_value",
                   "standardPrice": 1.1},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
@@ -182,7 +296,7 @@ class TestMaterial(unittest.TestCase):
     "code": 201,
     "message": "success",
     "data": {
-        "materialID": "materialID_value"
+        "materialID": 1
     }
 }"""
         print(201)
@@ -200,8 +314,7 @@ class TestMaterial(unittest.TestCase):
                   "mrpType": "mrpType_value", "mrpController": "mrpController_value", "lotSize": "lotSize_value",
                   "minimumLotSize": 1, "plannedDeliveryTime": "2024/01/01", "movingPrice": 1.1,
                   "priceUnit": "priceUnit_value", "standardPrice": 1.1},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
@@ -218,44 +331,44 @@ class TestMaterial(unittest.TestCase):
     def test_update_not_found(self):
         response = self.app.patch(
             "/api/material/update_not_found",
-            json={"materialID": 1, "userID": 1, "materialName": "materialName_value",
-                  "description": "description_value", "baseUnit": "baseUnit_value",
-                  "materialGroup": "materialGroup_value", "division": "division_value", "grossWeight": 1.1,
-                  "nettWeight": 1.1, "weightUnit": "weightUnit_value", "volume": 1.1, "volumeUnit": "volumeUnit_value",
-                  "packMaterial": "packMaterial_value", "availabilityCheck": "availabilityCheck_value",
-                  "transportationGroup": "transportationGroup_value", "loadingGroup": "loadingGroup_value",
-                  "mrpType": "mrpType_value", "mrpController": "mrpController_value", "lotSize": "lotSize_value",
-                  "minimumLotSize": 1, "plannedDeliveryTime": "2024/01/01", "movingPrice": 1.1,
-                  "priceUnit": "priceUnit_value", "standardPrice": 1.1},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            json={"materialID": 404, "userID": 404, "materialName": "materialName_value_404",
+                  "description": "description_value_404", "baseUnit": "baseUnit_value_404",
+                  "materialGroup": "materialGroup_value_404", "division": "division_value_404", "grossWeight": 0.404,
+                  "nettWeight": 0.404, "weightUnit": "weightUnit_value_404", "volume": 0.404,
+                  "volumeUnit": "volumeUnit_value_404", "packMaterial": "packMaterial_value_404",
+                  "availabilityCheck": "availabilityCheck_value_404",
+                  "transportationGroup": "transportationGroup_value_404", "loadingGroup": "loadingGroup_value_404",
+                  "mrpType": "mrpType_value_404", "mrpController": "mrpController_value_404",
+                  "lotSize": "lotSize_value_404", "minimumLotSize": 404, "plannedDeliveryTime": "2024/01/01",
+                  "movingPrice": 0.404, "priceUnit": "priceUnit_value_404", "standardPrice": 0.404},
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
         print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
         print("template data")
         template = """{
-    "code": 204,
+    "code": 404,
     "message": "material not found",
     "data": []
 }"""
-        print(204)
+        print(200)
         print(template)
 
     def test_query_success(self):
         response = self.app.get(
             "/api/material/query_success",
-            json={"materialID": 1, "userID": 1, "materialName": "materialName_value",
-                  "description": "description_value", "baseUnit": "baseUnit_value",
-                  "materialGroup": "materialGroup_value", "division": "division_value", "grossWeight": 1.1,
-                  "nettWeight": 1.1, "weightUnit": "weightUnit_value", "volume": 1.1, "volumeUnit": "volumeUnit_value",
-                  "packMaterial": "packMaterial_value", "availabilityCheck": "availabilityCheck_value",
-                  "transportationGroup": "transportationGroup_value", "loadingGroup": "loadingGroup_value",
-                  "mrpType": "mrpType_value", "mrpController": "mrpController_value", "lotSize": "lotSize_value",
-                  "minimumLotSize": 1, "plannedDeliveryTime": "2024/01/01", "movingPrice": 1.1,
-                  "priceUnit": "priceUnit_value", "standardPrice": 1.1},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            # json={"materialID": 1, "userID": 1, "materialName": "materialName_value",
+            #       "description": "description_value", "baseUnit": "baseUnit_value",
+            #       "materialGroup": "materialGroup_value", "division": "division_value", "grossWeight": 1.1,
+            #       "nettWeight": 1.1, "weightUnit": "weightUnit_value", "volume": 1.1, "volumeUnit": "volumeUnit_value",
+            #       "packMaterial": "packMaterial_value", "availabilityCheck": "availabilityCheck_value",
+            #       "transportationGroup": "transportationGroup_value", "loadingGroup": "loadingGroup_value",
+            #       "mrpType": "mrpType_value", "mrpController": "mrpController_value", "lotSize": "lotSize_value",
+            #       "minimumLotSize": 1, "plannedDeliveryTime": "2024/01/01", "movingPrice": 1.1,
+            #       "priceUnit": "priceUnit_value", "standardPrice": 1.1},
+            json={"userID": 1},
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
@@ -325,28 +438,28 @@ class TestMaterial(unittest.TestCase):
     def test_query_not_found(self):
         response = self.app.get(
             "/api/material/query_not_found",
-            json={"materialID": 1, "userID": 1, "materialName": "materialName_value",
-                  "description": "description_value", "baseUnit": "baseUnit_value",
-                  "materialGroup": "materialGroup_value", "division": "division_value", "grossWeight": 1.1,
-                  "nettWeight": 1.1, "weightUnit": "weightUnit_value", "volume": 1.1, "volumeUnit": "volumeUnit_value",
-                  "packMaterial": "packMaterial_value", "availabilityCheck": "availabilityCheck_value",
-                  "transportationGroup": "transportationGroup_value", "loadingGroup": "loadingGroup_value",
-                  "mrpType": "mrpType_value", "mrpController": "mrpController_value", "lotSize": "lotSize_value",
-                  "minimumLotSize": 1, "plannedDeliveryTime": "2024/01/01", "movingPrice": 1.1,
-                  "priceUnit": "priceUnit_value", "standardPrice": 1.1},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            json={"materialID": 404, "userID": 404, "materialName": "materialName_value_404",
+                  "description": "description_value_404", "baseUnit": "baseUnit_value_404",
+                  "materialGroup": "materialGroup_value_404", "division": "division_value_404", "grossWeight": 0.404,
+                  "nettWeight": 0.404, "weightUnit": "weightUnit_value_404", "volume": 0.404,
+                  "volumeUnit": "volumeUnit_value_404", "packMaterial": "packMaterial_value_404",
+                  "availabilityCheck": "availabilityCheck_value_404",
+                  "transportationGroup": "transportationGroup_value_404", "loadingGroup": "loadingGroup_value_404",
+                  "mrpType": "mrpType_value_404", "mrpController": "mrpController_value_404",
+                  "lotSize": "lotSize_value_404", "minimumLotSize": 404, "plannedDeliveryTime": "2024/01/01",
+                  "movingPrice": 0.404, "priceUnit": "priceUnit_value_404", "standardPrice": 0.404},
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
         print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
         print("template data")
         template = """{
-    "code": 204,
+    "code": 404,
     "message": "material not found",
     "data": []
 }"""
-        print(204)
+        print(200)
         print(template)
 
 
@@ -363,8 +476,7 @@ class TestPurchaseOrder(unittest.TestCase):
                   "deliveryDate": "2024/01/01", "quantity": 1, "netPrice": 1.1, "currency": "currency_value",
                   "purchasingGroup": "purchasingGroup_value", "purchasingOrganization": "purchasingOrganization_value",
                   "plant": "plant_value", "paymentTerms": "paymentTerms_value"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
@@ -374,7 +486,7 @@ class TestPurchaseOrder(unittest.TestCase):
     "code": 201,
     "message": "success",
     "data": {
-        "purchaseOrderID": "purchaseOrderID_value"
+        "purchaseOrderID": 1
     }
 }"""
         print(201)
@@ -387,8 +499,7 @@ class TestPurchaseOrder(unittest.TestCase):
                   "deliveryDate": "2024/01/01", "quantity": 1, "netPrice": 1.1, "currency": "currency_value",
                   "purchasingGroup": "purchasingGroup_value", "purchasingOrganization": "purchasingOrganization_value",
                   "plant": "plant_value", "paymentTerms": "paymentTerms_value"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
@@ -405,23 +516,23 @@ class TestPurchaseOrder(unittest.TestCase):
     def test_update_not_found(self):
         response = self.app.patch(
             "/api/purchase_order/update_not_found",
-            json={"purchaseOrderID": 1, "userID": 1, "supplierID": 1, "materialID": 1, "orderDate": "2024/01/01",
-                  "deliveryDate": "2024/01/01", "quantity": 1, "netPrice": 1.1, "currency": "currency_value",
-                  "purchasingGroup": "purchasingGroup_value", "purchasingOrganization": "purchasingOrganization_value",
-                  "plant": "plant_value", "paymentTerms": "paymentTerms_value"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            json={"purchaseOrderID": 404, "userID": 404, "supplierID": 404, "materialID": 404,
+                  "orderDate": "2024/01/01", "deliveryDate": "2024/01/01", "quantity": 404, "netPrice": 0.404,
+                  "currency": "currency_value_404", "purchasingGroup": "purchasingGroup_value_404",
+                  "purchasingOrganization": "purchasingOrganization_value_404", "plant": "plant_value_404",
+                  "paymentTerms": "paymentTerms_value_404"},
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
         print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
         print("template data")
         template = """{
-    "code": 204,
+    "code": 404,
     "message": "purchase order not found",
     "data": []
 }"""
-        print(204)
+        print(200)
         print(template)
 
     def test_query_success(self):
@@ -431,8 +542,7 @@ class TestPurchaseOrder(unittest.TestCase):
                   "deliveryDate": "2024/01/01", "quantity": 1, "netPrice": 1.1, "currency": "currency_value",
                   "purchasingGroup": "purchasingGroup_value", "purchasingOrganization": "purchasingOrganization_value",
                   "plant": "plant_value", "paymentTerms": "paymentTerms_value"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
@@ -480,23 +590,23 @@ class TestPurchaseOrder(unittest.TestCase):
     def test_query_not_found(self):
         response = self.app.get(
             "/api/purchase_order/query_not_found",
-            json={"purchaseOrderID": 1, "userID": 1, "supplierID": 1, "materialID": 1, "orderDate": "2024/01/01",
-                  "deliveryDate": "2024/01/01", "quantity": 1, "netPrice": 1.1, "currency": "currency_value",
-                  "purchasingGroup": "purchasingGroup_value", "purchasingOrganization": "purchasingOrganization_value",
-                  "plant": "plant_value", "paymentTerms": "paymentTerms_value"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            json={"purchaseOrderID": 404, "userID": 404, "supplierID": 404, "materialID": 404,
+                  "orderDate": "2024/01/01", "deliveryDate": "2024/01/01", "quantity": 404, "netPrice": 0.404,
+                  "currency": "currency_value_404", "purchasingGroup": "purchasingGroup_value_404",
+                  "purchasingOrganization": "purchasingOrganization_value_404", "plant": "plant_value_404",
+                  "paymentTerms": "paymentTerms_value_404"},
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
         print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
         print("template data")
         template = """{
-    "code": 204,
+    "code": 404,
     "message": "purchase order not found",
     "data": []
 }"""
-        print(204)
+        print(200)
         print(template)
 
 
@@ -513,8 +623,7 @@ class TestStock(unittest.TestCase):
                   "quantity": 1, "unitOfMeasure": "unitOfMeasure_value", "stockType": "stockType_value",
                   "valuationType": "valuationType_value", "batch": "batch_value",
                   "specialStockIndicator": "specialStockIndicator_value", "companyCode": "companyCode_value"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
@@ -524,7 +633,7 @@ class TestStock(unittest.TestCase):
     "code": 201,
     "message": "success",
     "data": {
-        "stockID": "stockID_value"
+        "stockID": 1
     }
 }"""
         print(201)
@@ -533,12 +642,11 @@ class TestStock(unittest.TestCase):
     def test_update_success(self):
         response = self.app.patch(
             "/api/stock/update_success",
-            json={"StockID": 1, "userID": 1, "materialID": 1, "plant": "plant_value",
+            json={"stockID": 1, "userID": 1, "materialID": 1, "plant": "plant_value",
                   "storageLocation": "storageLocation_value", "quantity": 1, "unitOfMeasure": "unitOfMeasure_value",
                   "stockType": "stockType_value", "valuationType": "valuationType_value", "batch": "batch_value",
                   "specialStockIndicator": "specialStockIndicator_value", "companyCode": "companyCode_value"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
@@ -555,34 +663,33 @@ class TestStock(unittest.TestCase):
     def test_update_not_found(self):
         response = self.app.patch(
             "/api/stock/update_not_found",
-            json={"StockID": 1, "userID": 1, "materialID": 1, "plant": "plant_value",
-                  "storageLocation": "storageLocation_value", "quantity": 1, "unitOfMeasure": "unitOfMeasure_value",
-                  "stockType": "stockType_value", "valuationType": "valuationType_value", "batch": "batch_value",
-                  "specialStockIndicator": "specialStockIndicator_value", "companyCode": "companyCode_value"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            json={"stockID": 404, "userID": 404, "materialID": 404, "plant": "plant_value_404",
+                  "storageLocation": "storageLocation_value_404", "quantity": 404,
+                  "unitOfMeasure": "unitOfMeasure_value_404", "stockType": "stockType_value_404",
+                  "valuationType": "valuationType_value_404", "batch": "batch_value_404",
+                  "specialStockIndicator": "specialStockIndicator_value_404", "companyCode": "companyCode_value_404"},
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
         print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
         print("template data")
         template = """{
-    "code": 204,
+    "code": 404,
     "message": "stock not found",
     "data": []
 }"""
-        print(204)
+        print(200)
         print(template)
 
     def test_query_success(self):
         response = self.app.get(
             "/api/stock/query_success",
-            json={"StockID": 1, "userID": 1, "materialID": 1, "plant": "plant_value",
+            json={"stockID": 1, "userID": 1, "materialID": 1, "plant": "plant_value",
                   "storageLocation": "storageLocation_value", "quantity": 1, "unitOfMeasure": "unitOfMeasure_value",
                   "stockType": "stockType_value", "valuationType": "valuationType_value", "batch": "batch_value",
                   "specialStockIndicator": "specialStockIndicator_value", "companyCode": "companyCode_value"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
@@ -593,7 +700,7 @@ class TestStock(unittest.TestCase):
     "message": "success",
     "data": [
         {
-            "StockID": 1,
+            "stockID": 1,
             "userID": 1,
             "materialID": 1,
             "plant": "plant_value1",
@@ -607,7 +714,7 @@ class TestStock(unittest.TestCase):
             "companyCode": "companyCode_value1"
         },
         {
-            "StockID": 2,
+            "stockID": 2,
             "userID": 2,
             "materialID": 2,
             "plant": "plant_value2",
@@ -628,23 +735,23 @@ class TestStock(unittest.TestCase):
     def test_query_not_found(self):
         response = self.app.get(
             "/api/stock/query_not_found",
-            json={"StockID": 1, "userID": 1, "materialID": 1, "plant": "plant_value",
-                  "storageLocation": "storageLocation_value", "quantity": 1, "unitOfMeasure": "unitOfMeasure_value",
-                  "stockType": "stockType_value", "valuationType": "valuationType_value", "batch": "batch_value",
-                  "specialStockIndicator": "specialStockIndicator_value", "companyCode": "companyCode_value"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            json={"stockID": 404, "userID": 404, "materialID": 404, "plant": "plant_value_404",
+                  "storageLocation": "storageLocation_value_404", "quantity": 404,
+                  "unitOfMeasure": "unitOfMeasure_value_404", "stockType": "stockType_value_404",
+                  "valuationType": "valuationType_value_404", "batch": "batch_value_404",
+                  "specialStockIndicator": "specialStockIndicator_value_404", "companyCode": "companyCode_value_404"},
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
         print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
         print("template data")
         template = """{
-    "code": 204,
+    "code": 404,
     "message": "stock not found",
     "data": []
 }"""
-        print(204)
+        print(200)
         print(template)
 
 
@@ -665,8 +772,7 @@ class TestSupplier(unittest.TestCase):
                   "partnerFunctions": "partnerFunctions_value", "streetAddress": "streetAddress_value",
                   "postalCode": "postalCode_value", "country": "country_value", "region": "region_value",
                   "city": "city_value", "contactInfo": "contactInfo_value"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
@@ -676,7 +782,7 @@ class TestSupplier(unittest.TestCase):
     "code": 201,
     "message": "success",
     "data": {
-        "supplierID": "supplierID_value"
+        "supplierID": 1
     }
 }"""
         print(201)
@@ -693,8 +799,7 @@ class TestSupplier(unittest.TestCase):
                   "partnerFunctions": "partnerFunctions_value", "streetAddress": "streetAddress_value",
                   "postalCode": "postalCode_value", "country": "country_value", "region": "region_value",
                   "city": "city_value", "contactInfo": "contactInfo_value"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
@@ -711,27 +816,27 @@ class TestSupplier(unittest.TestCase):
     def test_update_not_found(self):
         response = self.app.patch(
             "/api/supplier/update_not_found",
-            json={"supplierID": 1, "userID": 1, "supplierName": "supplierName_value", "address": "address_value",
-                  "communicationLang": "communicationLang_value", "taxNumber": 1, "companyCode": "companyCode_value",
-                  "reconciliationAcct": "reconciliationAcct_value", "checkDoubleVoice": "checkDoubleVoice_value",
-                  "clerkName": "clerkName_value", "purchasingOrg": "purchasingOrg_value",
-                  "orderCurrency": "orderCurrency_value", "paymentTerms": "paymentTerms_value",
-                  "partnerFunctions": "partnerFunctions_value", "streetAddress": "streetAddress_value",
-                  "postalCode": "postalCode_value", "country": "country_value", "region": "region_value",
-                  "city": "city_value", "contactInfo": "contactInfo_value"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            json={"supplierID": 404, "userID": 404, "supplierName": "supplierName_value_404",
+                  "address": "address_value_404", "communicationLang": "communicationLang_value_404", "taxNumber": 404,
+                  "companyCode": "companyCode_value_404", "reconciliationAcct": "reconciliationAcct_value_404",
+                  "checkDoubleVoice": "checkDoubleVoice_value_404", "clerkName": "clerkName_value_404",
+                  "purchasingOrg": "purchasingOrg_value_404", "orderCurrency": "orderCurrency_value_404",
+                  "paymentTerms": "paymentTerms_value_404", "partnerFunctions": "partnerFunctions_value_404",
+                  "streetAddress": "streetAddress_value_404", "postalCode": "postalCode_value_404",
+                  "country": "country_value_404", "region": "region_value_404", "city": "city_value_404",
+                  "contactInfo": "contactInfo_value_404"},
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
         print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
         print("template data")
         template = """{
-    "code": 204,
+    "code": 404,
     "message": "supplier not found",
     "data": []
 }"""
-        print(204)
+        print(200)
         print(template)
 
     def test_query_success(self):
@@ -745,8 +850,7 @@ class TestSupplier(unittest.TestCase):
                   "partnerFunctions": "partnerFunctions_value", "streetAddress": "streetAddress_value",
                   "postalCode": "postalCode_value", "country": "country_value", "region": "region_value",
                   "city": "city_value", "contactInfo": "contactInfo_value"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
@@ -808,149 +912,27 @@ class TestSupplier(unittest.TestCase):
     def test_query_not_found(self):
         response = self.app.get(
             "/api/supplier/query_not_found",
-            json={"supplierID": 1, "userID": 1, "supplierName": "supplierName_value", "address": "address_value",
-                  "communicationLang": "communicationLang_value", "taxNumber": 1, "companyCode": "companyCode_value",
-                  "reconciliationAcct": "reconciliationAcct_value", "checkDoubleVoice": "checkDoubleVoice_value",
-                  "clerkName": "clerkName_value", "purchasingOrg": "purchasingOrg_value",
-                  "orderCurrency": "orderCurrency_value", "paymentTerms": "paymentTerms_value",
-                  "partnerFunctions": "partnerFunctions_value", "streetAddress": "streetAddress_value",
-                  "postalCode": "postalCode_value", "country": "country_value", "region": "region_value",
-                  "city": "city_value", "contactInfo": "contactInfo_value"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            json={"supplierID": 404, "userID": 404, "supplierName": "supplierName_value_404",
+                  "address": "address_value_404", "communicationLang": "communicationLang_value_404", "taxNumber": 404,
+                  "companyCode": "companyCode_value_404", "reconciliationAcct": "reconciliationAcct_value_404",
+                  "checkDoubleVoice": "checkDoubleVoice_value_404", "clerkName": "clerkName_value_404",
+                  "purchasingOrg": "purchasingOrg_value_404", "orderCurrency": "orderCurrency_value_404",
+                  "paymentTerms": "paymentTerms_value_404", "partnerFunctions": "partnerFunctions_value_404",
+                  "streetAddress": "streetAddress_value_404", "postalCode": "postalCode_value_404",
+                  "country": "country_value_404", "region": "region_value_404", "city": "city_value_404",
+                  "contactInfo": "contactInfo_value_404"},
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
         print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
         print("template data")
         template = """{
-    "code": 204,
+    "code": 404,
     "message": "supplier not found",
     "data": []
 }"""
-        print(204)
-        print(template)
-
-
-class TestUser(unittest.TestCase):
-
-    def setUp(self):
-        self.app = app.test_client()
-        self.app.testing = True
-
-    def test_login_success(self):
-        response = self.app.post(
-            "/api/user/login_success",
-            json={"userID": 1, "password": "password_value"},
-            headers={"Content-Type": "application/json"}
-        )
-        print("real data")
-        print(response.status_code)
-        print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
-        print("template data")
-        template = """{
-    "code": 201,
-    "message": "success",
-    "data": {
-        "username": "username_value",
-        "role": "role_value"
-    }
-}"""
-        print(201)
-        print(template)
-
-    def test_login_not_found(self):
-        response = self.app.post(
-            "/api/user/login_not_found",
-            json={"userID": 1, "password": "password_value"},
-            headers={"Content-Type": "application/json"}
-        )
-        print("real data")
-        print(response.status_code)
-        print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
-        print("template data")
-        template = """{
-    "code": 204,
-    "message": "user not found",
-    "data": {}
-}"""
-        print(204)
-        print(template)
-
-    def test_login_wrong_password(self):
-        response = self.app.post(
-            "/api/user/login_wrong_password",
-            json={"userID": 1, "password": "password_value"},
-            headers={"Content-Type": "application/json"}
-        )
-        print("real data")
-        print(response.status_code)
-        print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
-        print("template data")
-        template = """{
-    "code": 401,
-    "message": "wrong password",
-    "data": {}
-}"""
-        print(401)
-        print(template)
-
-    def test_register_success(self):
-        response = self.app.post(
-            "/api/user/register_success",
-            json={"username": "username_value", "password": "password_value", "role": "role_value"},
-            headers={"Content-Type": "application/json"}
-        )
-        print("real data")
-        print(response.status_code)
-        print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
-        print("template data")
-        template = """{
-    "code": 200,
-    "message": "success",
-    "data": {
-        "userID": 1
-    }
-}"""
         print(200)
-        print(template)
-
-    def test_change_password_success(self):
-        response = self.app.post(
-            "/api/user/change_password_success",
-            json={"oldPassword": "old_password_value", "newPassword": "new_password_value"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
-        )
-        print("real data")
-        print(response.status_code)
-        print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
-        print("template data")
-        template = """{
-    "code": 200,
-    "message": "success",
-    "data": {}
-}"""
-        print(200)
-        print(template)
-
-    def test_change_password_wrong(self):
-        response = self.app.post(
-            "/api/user/change_password_wrong",
-            json={"oldPassword": "old_password_value", "newPassword": "new_password_value"},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
-        )
-        print("real data")
-        print(response.status_code)
-        print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
-        print("template data")
-        template = """{
-    "code": 401,
-    "message": "wrong password",
-    "data": {}
-}"""
-        print(401)
         print(template)
 
 
@@ -960,12 +942,11 @@ class TestDocumentFlow(unittest.TestCase):
         self.app = app.test_client()
         self.app.testing = True
 
-    def test_display_success_finished(self):
+    def test_display_success(self):
         response = self.app.get(
             "/api/document_flow/display_success/finished",
             json={"purchaseOrderID": 1, "goodsReceiptID": 1, "userID": 1},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
@@ -977,11 +958,11 @@ class TestDocumentFlow(unittest.TestCase):
     "data": [
         {
             "purchaseOrderID": 1,
-            "goodsReceiptID": "",
+            "goodsReceiptID": 1,
             "userID": 1
         },
         {
-            "purchaseOrderID": "",
+            "purchaseOrderID": 2,
             "goodsReceiptID": 2,
             "userID": 2
         }
@@ -990,12 +971,11 @@ class TestDocumentFlow(unittest.TestCase):
         print(200)
         print(template)
 
-    def test_display_success_unfinished(self):
+    def test_display_success(self):
         response = self.app.get(
             "/api/document_flow/display_success/unfinished",
             json={"purchaseOrderID": 1, "goodsReceiptID": 1, "userID": 1},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
@@ -1023,20 +1003,19 @@ class TestDocumentFlow(unittest.TestCase):
     def test_display_not_found(self):
         response = self.app.get(
             "/api/document_flow/display_not_found",
-            json={"purchaseOrderID": 1, "goodsReceiptID": 1, "userID": 1},
-            headers={"Authorization": "Bearer <token>",
-                     "Content-Type": "application/json"}
+            json={"purchaseOrderID": 404, "goodsReceiptID": 404, "userID": 404},
+            headers={"Content-Type": "application/json"}
         )
         print("real data")
         print(response.status_code)
         print(json.dumps(json.loads(response.data.decode('utf-8')), indent=4))
         print("template data")
         template = """{
-    "code": 204,
+    "code": 404,
     "message": "document flow not found",
     "data": []
 }"""
-        print(204)
+        print(200)
         print(template)
 
 
