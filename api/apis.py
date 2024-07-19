@@ -111,10 +111,9 @@ class Controller:
         else:
             instance = self.repository.query_list(kwargs=data)
         if instance:
-            if isinstance(instance, list):
-                return Response.query_success(list(map(lambda i: i.to_dict(), instance)))
-            else:
-                return Response.query_success(instance.to_dict())
+            if not isinstance(instance, list):
+                instance = [instance, ]
+            return Response.query_success(list(map(lambda i: i.to_dict(), instance)))
         else:
             return Response.not_found(self.entityName)
 
@@ -132,7 +131,6 @@ class UserController(Controller):
             self.blueprint.route('/login', methods=['POST'])(self.login)
             self.blueprint.route('/register', methods=['POST'])(self.register)
             self.blueprint.route('/change_password', methods=['POST'])(self.change_password)
-            ...
         elif env == "test":
             self.blueprint.route('/login_success', methods=['POST'])(self.login)
             self.blueprint.route('/login_not_found', methods=['POST'])(self.login)
@@ -140,8 +138,6 @@ class UserController(Controller):
             self.blueprint.route('/register_success', methods=['POST'])(self.register)
             self.blueprint.route('/change_password_success', methods=['POST'])(self.change_password)
             self.blueprint.route('/change_password_wrong', methods=['POST'])(self.change_password)
-
-            ...
         else:
             raise Exception(f"env {env} undefined")
 
@@ -186,3 +182,13 @@ class UserController(Controller):
             raise Warning(f"entity name {entityName} must be User")
         entityName = "User"
         return super().register_entity(entityName, env)
+
+
+class DocumentFlowController(Controller):
+    def register_routes(self, env: str):
+        if env == "dev":
+            self.blueprint.route('/display', methods=["GET"])(self.query)
+        elif env == "test":
+            self.blueprint.route('/display_success/finished', methods=["GET"])(self.query)
+            self.blueprint.route('/display_success/unfinished', methods=["GET"])(self.query)
+            self.blueprint.route('/display_not_found', methods=["GET"])(self.query)
