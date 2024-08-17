@@ -1,6 +1,7 @@
-from model import create_app
 from flask import make_response
 from flask_cors import CORS
+
+from model import create_app
 
 app = create_app()
 

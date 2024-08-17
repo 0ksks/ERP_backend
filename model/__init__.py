@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -11,6 +12,7 @@ def create_app():
     app.config.from_object(DBconfig)
 
     db.init_app(app)
+    migrate = Migrate(app, db)
     with app.app_context():
         from api import register_routes
 
