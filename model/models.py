@@ -94,7 +94,7 @@ class PurchaseOrder(db.Model, SerializerMixin):
     )  # 40000000开始自增
     userID = db.Column(db.Integer, ForeignKey("User.userID"))
     supplierID = db.Column(db.Integer, db.ForeignKey("Supplier.supplierID"))
-    materialID = db.Column(db.Integer, db.ForeignKey("Material.materialID"))
+    stockID = db.Column(db.Integer, db.ForeignKey("Stock.stockID"))
     orderDate = db.Column(db.Date)
     deliveryDate = db.Column(db.Date)
     quantity = db.Column(db.Integer)
