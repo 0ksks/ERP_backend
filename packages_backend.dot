@@ -1,0 +1,19 @@
+digraph "packages_backend" {
+rankdir=BT
+charset="utf-8"
+"backend" [color="black", label=<backend>, shape="box", style="solid"];
+"backend.TestAPP" [color="black", label=<backend.TestAPP>, shape="box", style="solid"];
+"backend.api" [color="black", label=<backend.api>, shape="box", style="solid"];
+"backend.api.apis" [color="black", label=<backend.api.apis>, shape="box", style="solid"];
+"backend.app" [color="black", label=<backend.app>, shape="box", style="solid"];
+"backend.model" [color="black", label=<backend.model>, shape="box", style="solid"];
+"backend.model.DBconfig" [color="black", label=<backend.model.DBconfig>, shape="box", style="solid"];
+"backend.model.DBconfig_private" [color="black", label=<backend.model.DBconfig_private>, shape="box", style="solid"];
+"backend.model.models" [color="black", label=<backend.model.models>, shape="box", style="solid"];
+"backend.model.repositories" [color="black", label=<backend.model.repositories>, shape="box", style="solid"];
+"backend.test" [color="black", label=<backend.test>, shape="box", style="solid"];
+"backend.TestAPP" -> "backend.app" [arrowhead="open", arrowtail="none"];
+"backend.api" -> "backend.api.apis" [arrowhead="open", arrowtail="none"];
+"backend.app" -> "backend.model" [arrowhead="open", arrowtail="none"];
+"backend.model" -> "backend.api" [arrowhead="open", arrowtail="none"];
+}
