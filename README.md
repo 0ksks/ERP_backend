@@ -14,9 +14,5 @@ FLASK backend development
 - \_\_init\_\_\.py
 - \.gitignore
 - app\.py
-- classes\_backend\.dot
 - environment\.yaml
-- packages\_backend\.dot
 - README\.md
-- test\.py
-- TestAPP\.py
