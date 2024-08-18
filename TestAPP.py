@@ -4,6 +4,33 @@ import unittest
 from app import app
 
 
+class TestDev(unittest.TestCase):
+    def setUp(self):
+        self.app = app.test_client()
+        self.app.testing = True
+
+    def test_dev_login(self):
+        response = self.app.post(
+            "/api/user/login",
+            json={"userID": 1, "password": "password_value"},
+            headers={"Content-Type": "application/json"},
+        )
+        print("real data")
+        print(response.status_code)
+        print(json.dumps(json.loads(response.data.decode("utf-8")), indent=4))
+        print("template data")
+        template = """{
+        "code": 201,
+        "message": "success",
+        "data": {
+            "userID": 1,
+            "role": "role_value"
+        }
+    }"""
+        print(201)
+        print(template)
+
+
 class TestUser(unittest.TestCase):
 
     def setUp(self):
@@ -12,7 +39,7 @@ class TestUser(unittest.TestCase):
 
     def test_login_success(self):
         response = self.app.post(
-            "/api/user/login_success",
+            "/user/login_success",
             json={"userID": 1, "password": "password_value"},
             headers={"Content-Type": "application/json"},
         )
@@ -714,7 +741,7 @@ class TestSupplier(unittest.TestCase):
 
     def test_query_success(self):
         response = self.app.get(
-            "/api/supplier/query_success",
+            "/api/supplier/query",
             json={
                 "supplierID": 1,
                 "userID": 1,
@@ -1046,7 +1073,7 @@ class TestGoodsReceipt(unittest.TestCase):
             "/api/goods_receipt/create_success",
             json={
                 "userID": 1,
-                "purchaseOrderID": 1,
+                "purchaseOrderID": 2,
                 "materialID": 1,
                 "supplierID": 1,
                 "receiptDate": "2024/01/01",

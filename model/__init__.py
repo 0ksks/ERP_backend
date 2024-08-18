@@ -7,9 +7,9 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
-    from . import DBconfig
+    from . import DBconfig_private
 
-    app.config.from_object(DBconfig)
+    app.config.from_object(DBconfig_private)
 
     db.init_app(app)
     migrate = Migrate(app, db)

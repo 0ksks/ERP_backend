@@ -8,7 +8,7 @@ import stringcase
 from flask import Blueprint, request
 from sqlalchemy_serializer import SerializerMixin
 
-from model.repositories import BaseRepository
+from model.repositories import BaseRepository, DocumentFlowRepository
 
 ResponseData = TypeVar("ResponseData", dict[str, Any], list[dict[str, Any]])
 
@@ -83,7 +83,7 @@ class Controller:
         if env == "dev":
             self.blueprint.route("/create", methods=["POST"])(self.create)
             self.blueprint.route("/update", methods=["PATCH"])(self.update)
-            self.blueprint.route("/query", methods=["GET"])(self.query)
+            self.blueprint.route("/query", methods=["POST"])(self.query)
         elif env == "test":
             self.blueprint.route("/create_success", methods=["POST"])(self.create)
             self.blueprint.route("/update_success", methods=["PATCH"])(self.update)
@@ -134,8 +134,14 @@ class Controller:
     def register_entity(cls, entityName: str, env: Literal["test", "dev"] = "test"):
         module = importlib.import_module("model.repositories")
         EntityRepository = getattr(module, f"{entityName}Repository")
+        if env == "test":
+            prefix = "/api/"
+        else:
+            prefix = "/"
         EntityBlueprint = Blueprint(
-            entityName, __name__, url_prefix=f"/api/{stringcase.snakecase(entityName)}"
+            entityName,
+            __name__,
+            url_prefix=f"{prefix}{stringcase.snakecase(entityName)}",
         )
         return cls(entityName, EntityRepository(), EntityBlueprint, env).blueprint
 
@@ -211,7 +217,7 @@ class UserController(Controller):
 class DocumentFlowController(Controller):
     def register_routes(self, env: str):
         if env == "dev":
-            self.blueprint.route("/display", methods=["GET"])(self.query)
+            self.blueprint.route("/display", methods=["POST"])(self.query)
         elif env == "test":
             self.blueprint.route("/display_success/finished", methods=["GET"])(
                 self.query
@@ -220,3 +226,46 @@ class DocumentFlowController(Controller):
                 self.query
             )
             self.blueprint.route("/display_not_found", methods=["GET"])(self.query)
+
+
+class PurchaseOrderController(Controller):
+    def create(self):
+        response, _ = super().create()
+        responseData = json.loads(response)["data"]
+        purchaseOrderID = responseData["purchaseOrderID"]
+        requestData = request.json
+        userID = requestData["userID"]
+        documentFlowRepository = DocumentFlowRepository()
+        instance: SerializerMixin = documentFlowRepository.create(
+            dict(userID=userID, purchaseOrderID=purchaseOrderID)
+        )
+        entityIDValue = instance.to_dict()[self.entityIDKey]
+        return Response.create_success({self.entityIDKey: entityIDValue})
+
+
+class GoodsReceiptController(Controller):
+    def create(self):
+        requestData = request.json  # 获取请求数据
+
+        userID = requestData["userID"]
+        purchaseOrderID = requestData["purchaseOrderID"]
+
+        documentFlowRepository = DocumentFlowRepository()
+        documentFlowInstance: SerializerMixin = documentFlowRepository.query_one(
+            dict(userID=userID, purchaseOrderID=purchaseOrderID)
+        )  # 从document flow中查找
+        if documentFlowInstance:  # 如果找到有
+            response, _ = super().create()  # 创建goods receipt
+            responseData = json.loads(response)["data"]
+            goodsReceiptID = responseData[self.entityIDKey]  # 获取goods receipt的ID
+            documentFlowID = documentFlowInstance.to_dict()[
+                "documentID"
+            ]  # 获取查出来的document flow ID
+            documentFlowRepository.update(
+                documentFlowID, dict(goodsReceiptID=goodsReceiptID)
+            )  # document flow添加goods receipt
+            goodsReceiptInstance: SerializerMixin = self.repository.create(
+                kwargs=requestData
+            )
+            entityIDValue = goodsReceiptInstance.to_dict()[self.entityIDKey]
+            return Response.create_success({self.entityIDKey: entityIDValue})
