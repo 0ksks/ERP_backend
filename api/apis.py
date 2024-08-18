@@ -20,18 +20,23 @@ def dict2base64(data):
     base64_bytes = base64.b64encode(
         json_str.encode("utf-8")
     )  # 将JSON字符串编码为base64
+    print("encode")
+    print("data:", data)
+    print("base64:", base64_bytes)
     return base64_bytes.decode("utf-8")  # 将base64字节转换为字符串并返回
 
 
 # 将base64字符串解码为字典的函数
 def base642dict(base64_str):
+    print("decode")
+    print("base64:", base64_str)
     try:
         json_bytes = base64.b64decode(base64_str)  # 将base64字符串解码为字节
         data = json.loads(
             json_bytes.decode("utf-8")
         )  # 将字节转换为JSON字符串再转为字典
         return data
-    finally:
+    except:
         return None  # 确保在出现错误时返回None
 
 
@@ -113,6 +118,8 @@ class Controller:
     # 处理实体创建的函数
     def create(self):
         data = request.json  # 从请求中获取JSON数据
+        print("url ", request.url)
+        print("request data in line 116", data)
         instance: SerializerMixin = self.repository.create(
             kwargs=data
         )  # 使用仓库创建实体实例
@@ -140,10 +147,12 @@ class Controller:
     # 处理实体查询的函数
     def query(self):
         data = request.json  # 从请求中获取JSON数据
+        print("Controller query in line 114", data)
         ID = data.get(self.entityIDKey, None)  # 获取请求数据中的实体ID（如果有）
         if ID:
             instance = self.repository.get(ID=ID)  # 根据ID获取实体实例
         else:
+            data = {k: v for k, v in data.items() if v != ""}  # 过滤掉空字符串
             instance = self.repository.query_list(
                 kwargs=data
             )  # 根据请求数据查询实体列表
@@ -205,7 +214,7 @@ class UserController(Controller):
     # 处理用户登录的函数
     def login(self):
         data = request.json  # 从请求中获取JSON数据
-        ID = data.get("userID")  # 从请求数据中获取用户ID
+        ID = data.get("username")  # 从请求数据中获取用户ID
         instance = self.repository.get(ID=ID)  # 从仓库中获取用户实例
         password = data.get("password")  # 从请求数据中获取密码
         if instance:  # 如果用户存在
@@ -280,8 +289,12 @@ class PurchaseOrderController(Controller):
         response, _ = super().create()  # 调用基类的create方法
         responseData = json.loads(response)["data"]  # 获取创建的实体数据
         purchaseOrderID = responseData["purchaseOrderID"]  # 获取采购订单ID
-        requestData = request.json  # 获取请求数据
-        userID = requestData["userID"]  # 获取用户ID
+        authHeader = request.headers.get("Authorization")
+        token = authHeader.split()[1]
+        print(token)
+        decodedToken = base642dict(token)
+        print(decodedToken)
+        userID = decodedToken.get("userID")
         documentFlowRepository = DocumentFlowRepository()  # 创建DocumentFlow仓库实例
         instance: SerializerMixin = documentFlowRepository.create(
             dict(userID=userID, purchaseOrderID=purchaseOrderID)

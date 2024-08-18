@@ -25,8 +25,8 @@ class Supplier(db.Model, SerializerMixin):
     taxNumber = db.Column(db.Integer)
     companyCode = db.Column(db.String(255))
     reconciliationAcct = db.Column(db.String(255))
-    # termsOfPayment = db.Column(db.String(255))
-    checkDoubleVoice = db.Column(db.String(255))
+    termsOfPayment = db.Column(db.String(255))
+    checkDoubleInvoice = db.Column(db.String(255))
     clerkName = db.Column(db.String(255))
     purchasingOrg = db.Column(db.String(255))
     orderCurrency = db.Column(db.String(255))
@@ -38,6 +38,7 @@ class Supplier(db.Model, SerializerMixin):
     region = db.Column(db.String(255))
     city = db.Column(db.String(255))
     contactInfo = db.Column(db.String(255))
+    discountConditions = db.Column(db.String(255))
 
 
 class Material(db.Model, SerializerMixin):
@@ -52,7 +53,7 @@ class Material(db.Model, SerializerMixin):
     materialGroup = db.Column(db.String(255))
     division = db.Column(db.String(255))
     grossWeight = db.Column(db.Float)
-    nettWeight = db.Column(db.Float)
+    netWeight = db.Column(db.Float)
     weightUnit = db.Column(db.String(255))
     volume = db.Column(db.Float)
     volumeUnit = db.Column(db.String(255))
@@ -65,7 +66,7 @@ class Material(db.Model, SerializerMixin):
     lotSize = db.Column(db.String(255))
     minimumLotSize = db.Column(db.Integer)
     plannedDeliveryTime = db.Column(db.Date)
-    # valuationClass = db.Column(db.String(255))
+    valuationClass = db.Column(db.String(255))
     movingPrice = db.Column(db.Float)
     priceUnit = db.Column(db.String(255))
     standardPrice = db.Column(db.Float)

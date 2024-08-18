@@ -25,7 +25,10 @@ class BaseRepository(Generic[T]):
     def query_list(
         self, kwargs: dict[str, Any]
     ) -> list[T]:  # 用于模糊条件查询，返回多条数据
-        return self.model.query.filter_by(**kwargs).all()
+        if len(kwargs) > 0:
+            return self.model.query.filter_by(**kwargs).all()
+        else:
+            return self.model.query.all()
 
     # 根据条件查询一条数据，返回一个Optional类型的模型实例
     def query_one(

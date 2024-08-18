@@ -10,7 +10,7 @@ def register_routes(app):
         DocumentFlowController,
     )
 
-    env: Literal["test", "dev"] = "test"
+    env: Literal["test", "dev"] = "dev"
 
     app.register_blueprint(UserController.register_entity(env=env))
     app.register_blueprint(
