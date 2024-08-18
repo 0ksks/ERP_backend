@@ -1,0 +1,16 @@
+digraph "classes_backend" {
+
+rankdir=BT
+charset="utf-8"
+"backend.api.apis.Controller" [color="black", fontcolor="black", label=<{Controller|blueprint : Blueprint<br ALIGN="LEFT"/>entityIDKey<br ALIGN="LEFT"/>entityName : str<br ALIGN="LEFT"/>repository : Type[BaseRepository]<br ALIGN="LEFT"/>|create()<br ALIGN="LEFT"/>query()<br ALIGN="LEFT"/>register_entity(entityName: str, env: Literal['test', 'dev'])<br ALIGN="LEFT"/>register_routes(env: str)<br ALIGN="LEFT"/>update()<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"backend.api.apis.DocumentFlowController" [color="black", fontcolor="black", label=<{DocumentFlowController|<br ALIGN="LEFT"/>|register_routes(env: str)<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"backend.api.apis.GoodsReceiptController" [color="black", fontcolor="black", label=<{GoodsReceiptController|<br ALIGN="LEFT"/>|create()<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"backend.api.apis.PurchaseOrderController" [color="black", fontcolor="black", label=<{PurchaseOrderController|<br ALIGN="LEFT"/>|create()<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"backend.api.apis.Response" [color="black", fontcolor="black", label=<{Response|code : int<br ALIGN="LEFT"/>data : ResponseData<br ALIGN="LEFT"/>json<br ALIGN="LEFT"/>message : str<br ALIGN="LEFT"/>|create_success(data: ResponseData)<br ALIGN="LEFT"/>not_found(entity: str)<br ALIGN="LEFT"/>query_success(data: ResponseData)<br ALIGN="LEFT"/>update_success()<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"backend.api.apis.UserController" [color="black", fontcolor="black", label=<{UserController|<br ALIGN="LEFT"/>|change_password()<br ALIGN="LEFT"/>login()<br ALIGN="LEFT"/>register()<br ALIGN="LEFT"/>register_entity(entityName: str, env: Literal['test', 'dev'])<br ALIGN="LEFT"/>register_routes(env: str)<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"backend.api.apis.DocumentFlowController" -> "backend.api.apis.Controller" [arrowhead="empty", arrowtail="none"];
+"backend.api.apis.GoodsReceiptController" -> "backend.api.apis.Controller" [arrowhead="empty", arrowtail="none"];
+"backend.api.apis.PurchaseOrderController" -> "backend.api.apis.Controller" [arrowhead="empty", arrowtail="none"];
+"backend.api.apis.UserController" -> "backend.api.apis.Controller" [arrowhead="empty", arrowtail="none"];
+
+}
