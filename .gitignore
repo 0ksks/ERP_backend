@@ -1,6 +1,5 @@
 # custom
 utils/
-!utils/print_tree.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
