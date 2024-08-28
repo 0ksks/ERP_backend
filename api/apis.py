@@ -117,9 +117,7 @@ class Controller:
 
     # 处理实体创建的函数
     def create(self):
-        data = request.json  # 从请求中获取JSON数据
-        print("url ", request.url)
-        print("request data in line 116", data)
+        data = request.json
         instance: SerializerMixin = self.repository.create(
             kwargs=data
         )  # 使用仓库创建实体实例
@@ -130,29 +128,22 @@ class Controller:
 
     # 处理实体更新的函数
     def update(self):
-        data: dict = request.json  # 从请求中获取JSON数据
-        ID = data.get(self.entityIDKey)  # 从请求数据中获取实体ID
-        if ID is None:  # 如果请求数据中没有ID，从授权头中获取
-            authHeader = request.headers.get("Authorization")
-            token = authHeader.split(" ")[1]
-            decodedToken = base642dict(token)
-            ID = decodedToken.get("userID")
-
-        instance = self.repository.update(ID=ID, kwargs=data)  # 在仓库中更新实体
-        if instance:
+        data = request.json
+        ID = data.get(self.entityIDKey, None)  # 获取请求数据中的实体ID（如果有）
+        if ID:
+            self.repository.update(ID=ID, kwargs=data)
             return Response.update_success()  # 如果更新成功，返回成功响应
         else:
             return Response.not_found(self.entityName)  # 如果未找到实体，返回404响应
 
     # 处理实体查询的函数
     def query(self):
-        data = request.json  # 从请求中获取JSON数据
+        data = request.json
         print("Controller query in line 114", data)
         ID = data.get(self.entityIDKey, None)  # 获取请求数据中的实体ID（如果有）
         if ID:
             instance = self.repository.get(ID=ID)  # 根据ID获取实体实例
         else:
-            data = {k: v for k, v in data.items() if v != ""}  # 过滤掉空字符串
             instance = self.repository.query_list(
                 kwargs=data
             )  # 根据请求数据查询实体列表
@@ -214,12 +205,16 @@ class UserController(Controller):
     # 处理用户登录的函数
     def login(self):
         data = request.json  # 从请求中获取JSON数据
-        ID = data.get("username")  # 从请求数据中获取用户ID
+        ID = data.get("userID")  # 从请求数据中获取用户ID
         instance = self.repository.get(ID=ID)  # 从仓库中获取用户实例
         password = data.get("password")  # 从请求数据中获取密码
         if instance:  # 如果用户存在
             if password == instance.password:  # 检查密码是否匹配
-                dataNoToken = {"userID": instance.userID, "role": instance.role}
+                dataNoToken = {
+                    "userID": instance.userID,
+                    "username": instance.username,
+                    "role": instance.role,
+                }
                 token = dict2base64(dataNoToken)  # 将用户数据编码为base64 token
                 dataToken = dataNoToken
                 dataToken["token"] = token  # 在响应数据中添加token
