@@ -30,7 +30,6 @@ class Supplier(db.Model, SerializerMixin):
     clerkName = db.Column(db.String(255))
     purchasingOrg = db.Column(db.String(255))
     orderCurrency = db.Column(db.String(255))
-    paymentTerms = db.Column(db.String(255))
     partnerFunctions = db.Column(db.String(255))
     streetAddress = db.Column(db.String(255))
     postalCode = db.Column(db.String(255))

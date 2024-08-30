@@ -55,6 +55,14 @@ class BaseRepository(Generic[T]):
         db.session.commit()  # 提交事务保存更新
         return instance
 
+    def delete(self, ID: PrimaryKey) -> Optional[T]:
+        instance = self.get(ID)
+        if instance is None:
+            return None
+        db.session.delete(instance)
+        db.session.commit()
+        return instance
+
 
 # 定义具体的Repository类，并指定模型类型
 

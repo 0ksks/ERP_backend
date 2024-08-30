@@ -23,4 +23,4 @@ def after(resp):
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()

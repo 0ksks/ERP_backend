@@ -20,9 +20,6 @@ def dict2base64(data):
     base64_bytes = base64.b64encode(
         json_str.encode("utf-8")
     )  # 将JSON字符串编码为base64
-    print("encode")
-    print("data:", data)
-    print("base64:", base64_bytes)
     return base64_bytes.decode("utf-8")  # 将base64字节转换为字符串并返回
 
 
@@ -65,6 +62,10 @@ class Response:
     def update_success():
         return Response(code=200, message="success", data={}).json, 200
 
+    @staticmethod
+    def delete_success():
+        return Response(code=200, message="success", data={}).json, 200
+
     # 创建找不到资源的响应的静态方法
     @staticmethod
     def not_found(entity: str):
@@ -81,6 +82,10 @@ class Response:
     @staticmethod
     def query_success(data: ResponseData):
         return Response(code=200, message="success", data=data).json, 200
+
+    @staticmethod
+    def unauthorized():
+        return Response(code=401, message="Unauthorized", data={}).json, 401
 
 
 # 基础控制器类，处理基本的CRUD操作
@@ -106,6 +111,9 @@ class Controller:
             self.blueprint.route("/create", methods=["POST"])(self.create)
             self.blueprint.route("/update", methods=["PATCH"])(self.update)
             self.blueprint.route("/query", methods=["POST"])(self.query)
+            self.blueprint.route(
+                f"/delete/<int:{self.entityIDKey}>", methods=["DELETE"]
+            )(self.delete)
         elif env == "test":
             self.blueprint.route("/create_success", methods=["POST"])(self.create)
             self.blueprint.route("/update_success", methods=["PATCH"])(self.update)
@@ -139,7 +147,6 @@ class Controller:
     # 处理实体查询的函数
     def query(self):
         data = request.json
-        print("Controller query in line 114", data)
         ID = data.get(self.entityIDKey, None)  # 获取请求数据中的实体ID（如果有）
         if ID:
             instance = self.repository.get(ID=ID)  # 根据ID获取实体实例
@@ -157,6 +164,19 @@ class Controller:
             )  # 返回查询成功的响应
         else:
             return Response.not_found(self.entityName)  # 如果未找到实体，返回404响应
+
+    def delete(self, **kwargs):
+        entityID = kwargs.get(self.entityIDKey)
+        try:
+            instance = self.repository.delete(ID=entityID)
+        except Exception as e:
+            import re
+
+            match = re.findall(r"\(\d+, \'(.*)\'\)", e.args[0])
+            return Response(code=409, message=match[0], data={}).json, 200
+        if instance:
+            return Response.delete_success()
+        return Response.not_found(self.entityName)
 
     # 类方法，用于为给定的环境注册实体控制器
     @classmethod
@@ -187,6 +207,9 @@ class UserController(Controller):
             self.blueprint.route("/register", methods=["POST"])(self.register)
             self.blueprint.route("/change_password", methods=["POST"])(
                 self.change_password
+            )
+            self.blueprint.route("/change_username", methods=["POST"])(
+                self.change_username
             )
         elif env == "test":
             self.blueprint.route("/login_success", methods=["POST"])(self.login)
@@ -234,11 +257,13 @@ class UserController(Controller):
     # 处理修改密码的函数
     def change_password(self):
         data = request.json  # 从请求中获取JSON数据
-        oldPasswordInput = data.get("oldPassword")  # 获取请求中的旧密码
-        oldPasswordReal = self.repository.get(
+        currentPasswordInput = data.get("currentPassword")  # 获取请求中的旧密码
+        currentPasswordReal = self.repository.get(
             ID=data.get("userID")
         ).password  # 从仓库中获取当前密码
-        if oldPasswordInput == oldPasswordReal:
+        print(f"{currentPasswordInput = }")
+        print(f"{currentPasswordReal = }")
+        if currentPasswordInput == currentPasswordReal:
             self.repository.update(
                 ID=data.get("userID"), kwargs={"password": data.get("newPassword")}
             )  # 在仓库中更新密码
@@ -248,6 +273,17 @@ class UserController(Controller):
                 Response(code=401, message="wrong password", data={}).json,
                 200,
             )  # 如果密码不匹配，返回错误响应
+
+    def change_username(self):
+        data = request.json
+        ID = data.get("userID")
+        print("changing username", data, ID)
+        instance = self.repository.update(
+            ID=ID, kwargs={"username": data.get("username")}
+        )
+        if instance:
+            return Response.update_success()
+        return Response.not_found(self.entityName)
 
     # 类方法，用于注册User实体控制器
     @classmethod
@@ -284,8 +320,14 @@ class PurchaseOrderController(Controller):
         response, _ = super().create()  # 调用基类的create方法
         responseData = json.loads(response)["data"]  # 获取创建的实体数据
         purchaseOrderID = responseData["purchaseOrderID"]  # 获取采购订单ID
-        authHeader = request.headers.get("Authorization")
+        print("headers 326")
+        print(request.headers.get("Authorization"))
+        authHeader = request.headers.get("Authorization", None)
         token = authHeader.split()[1]
+        print(token)
+        print(type(token))
+        if authHeader is None or token == "null":
+            return Response.unauthorized()
         print(token)
         decodedToken = base642dict(token)
         print(decodedToken)
@@ -306,7 +348,14 @@ class GoodsReceiptController(Controller):
     def create(self):
         requestData = request.json  # 获取请求数据
 
-        userID = requestData["userID"]
+        authHeader = request.headers.get("Authorization", None)
+        token = authHeader.split()[1]
+        if authHeader is None or token == "null":
+            return Response.unauthorized()
+        print(token)
+        decodedToken = base642dict(token)
+        print(decodedToken)
+        userID = decodedToken.get("userID")
         purchaseOrderID = requestData["purchaseOrderID"]
 
         documentFlowRepository = DocumentFlowRepository()  # 创建DocumentFlow仓库实例
@@ -315,21 +364,20 @@ class GoodsReceiptController(Controller):
         )  # 查询对应的DocumentFlow实例
 
         if documentFlowInstance:  # 如果找到DocumentFlow实例
-            response, _ = super().create()  # 调用基类的create方法创建GoodsReceipt
-            responseData = json.loads(response)["data"]  # 获取创建的GoodsReceipt数据
-            goodsReceiptID = responseData[self.entityIDKey]  # 获取GoodsReceipt ID
+            goodsReceiptInstance: SerializerMixin = self.repository.create(
+                kwargs=requestData
+            )  # 在仓库中创建GoodsReceipt
+            goodsReceiptID = goodsReceiptInstance.to_dict()[
+                self.entityIDKey
+            ]  # 获取GoodsReceipt ID
             documentFlowID = documentFlowInstance.to_dict()[
                 "documentID"
             ]  # 获取DocumentFlow ID
             documentFlowRepository.update(
                 documentFlowID, dict(goodsReceiptID=goodsReceiptID)
             )  # 更新DocumentFlow，添加GoodsReceipt ID
-            goodsReceiptInstance: SerializerMixin = self.repository.create(
-                kwargs=requestData
-            )  # 在仓库中创建GoodsReceipt
-            entityIDValue = goodsReceiptInstance.to_dict()[
-                self.entityIDKey
-            ]  # 获取GoodsReceipt ID
             return Response.create_success(
-                {self.entityIDKey: entityIDValue}
+                {self.entityIDKey: goodsReceiptID}
             )  # 返回成功响应
+        else:
+            return Response.not_found("purchaseOrder")
